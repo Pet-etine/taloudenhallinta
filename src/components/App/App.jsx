@@ -3,6 +3,8 @@ import Header from '../Header'
 import styles from './App.module.scss'
 import Item from '../Item'
 import Menu from '../Menu'
+import Button from '../../shared/buttons'
+
 
 function App() {
 
@@ -15,7 +17,8 @@ function App() {
           <Item />
           <Item />
           <Item />
-        </Content>
+          <Button>LISÄÄ UUSI RIVI</Button>
+        </Content>     
         <Menu />
       </div>
     </>

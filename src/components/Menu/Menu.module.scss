@@ -1,4 +1,4 @@
-@import '../../assets/styles/_config.scss'; 
+@import '../../assets/styles/_config.scss';
 
 .menu {
     background-color: $color-neutral-darker;
@@ -9,9 +9,19 @@
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-  }
 
-  .menu > div {
+}
+
+.menu>div {
     display: flex;
-    align-items: center;
-  }
+    flex-direction: column; // Stack icon and text vertically
+    align-items: center; // Center-align items
+    gap: 0.5rem; // Add space between icon and text
+}
+
+.menu>span {
+    span {
+        font-size: 14px; // Adjust font size
+    }
+
+}

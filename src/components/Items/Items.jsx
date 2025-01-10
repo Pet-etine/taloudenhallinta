@@ -2,6 +2,8 @@ import { useLoaderData } from 'react-router-dom'
 import styles from './Items.module.scss'
 import { FloatingButton } from '../../shared/buttons'
 import Item from '../Item/Item'
+import { Link } from 'react-router-dom'
+
 
 function Items() {
 
@@ -11,7 +13,7 @@ function Items() {
   return (
     <div className={styles.items}>
       {items}
-      <FloatingButton secondary>+</FloatingButton>
+      <Link to="/add"><FloatingButton secondary>+</FloatingButton></Link>
     </div>
   )
 

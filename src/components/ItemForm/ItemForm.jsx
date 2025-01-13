@@ -13,20 +13,21 @@ function ItemForm(props) {
     const submit = () => {
         let storedValues = Object.assign({}, values)
         storedValues.amount = parseFloat(storedValues.amount)
-        storedValues.id = crypto.randomUUID()
+        storedValues.id = storedValues.id ? storedValues.id : crypto.randomUUID()
         props.onItemSubmit(storedValues)
         navigate(-1)
       }
     
     
-    const initialState = {
+      const initialState = props.formData ? props.formData : {
         type: "",
         amount: 0,
         paymentDate: "",
         periodStart: "",
         periodEnd: "",
         receiver: ""
-    }
+      }
+    
     const { values, handleChange, handleSubmit } = useForm(submit, initialState, false)
 
     const handleCancel = () => {
@@ -84,7 +85,7 @@ function ItemForm(props) {
                     <Button onClick={handleCancel}>PERUUTA</Button>
                 </div>
                 <div>
-                    <Button primary type='submit'>LISÄÄ</Button>
+                <Button primary type='submit'>{ props.formData ? "TALLENNA" : "LISÄÄ" }</Button>
                 </div>
             </div>
         </div>

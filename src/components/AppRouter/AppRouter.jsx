@@ -21,7 +21,7 @@ function AppRouter(props) {
         },
         { path: "stats", element: <Stats /> },
         { path: "settings", element: <Settings /> },
-        { path: "add", element: <AddItem /> },
+        { path: "add", element: <AddItem onItemSubmit={props.onItemSubmit} /> },
       ]
     }
   ])

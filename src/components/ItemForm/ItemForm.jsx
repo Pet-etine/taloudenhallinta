@@ -16,22 +16,26 @@ function ItemForm(props) {
         storedValues.id = storedValues.id ? storedValues.id : crypto.randomUUID()
         props.onItemSubmit(storedValues)
         navigate(-1)
-      }
-    
-    
-      const initialState = props.formData ? props.formData : {
+    }
+
+
+    const initialState = props.formData ? props.formData : {
         type: "",
         amount: 0,
         paymentDate: "",
         periodStart: "",
         periodEnd: "",
         receiver: ""
-      }
-    
+    }
+
     const { values, handleChange, handleSubmit } = useForm(submit, initialState, false)
 
     const handleCancel = () => {
         navigate('/')
+    }
+    const handleDelete = () => {
+        props.onItemDelete(values.id)
+        navigate(-1)
     }
 
 
@@ -85,16 +89,25 @@ function ItemForm(props) {
                     <Button onClick={handleCancel}>PERUUTA</Button>
                 </div>
                 <div>
-                <Button primary
-                      disabled={values.type &&
-                                values.amount &&
-                                values.paymentDate &&
-                                values.receiver ? "" : "true"}
-                      type='submit'>
-                { props.formData ? "TALLENNA" : "LISÄÄ" }
-              </Button>
+                    <Button primary
+                        disabled={values.type &&
+                            values.amount &&
+                            values.paymentDate &&
+                            values.receiver ? "" : "true"}
+                        type='submit'>
+                        {props.formData ? "TALLENNA" : "LISÄÄ"}
+                    </Button>
                 </div>
             </div>
+            {props.onItemDelete ?
+                <div className={styles.itemform_row}>
+                    <div>
+                        <Button secondary onClick={handleDelete}>POISTA</Button>
+                    </div>
+                    <div></div>
+                </div>
+                : null}
+
         </div>
     )
 

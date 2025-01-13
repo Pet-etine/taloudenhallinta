@@ -13,6 +13,7 @@ function ItemForm(props) {
     const submit = () => {
         let storedValues = Object.assign({}, values)
         storedValues.amount = parseFloat(storedValues.amount)
+        storedValues.id = crypto.randomUUID()
         props.onItemSubmit(storedValues)
         navigate(-1)
       }

@@ -83,32 +83,33 @@ function ItemForm(props) {
                         </div>
                     </div>
                 </div>
-            </form>
-            <div className={styles.itemform_row}>
-                <div>
-                    <Button onClick={handleCancel}>PERUUTA</Button>
-                </div>
-                <div>
-                    <Button primary
-                        disabled={values.type &&
-                            values.amount &&
-                            values.paymentDate &&
-                            values.receiver ? "" : "true"}
-                        type='submit'>
-                        {props.formData ? "TALLENNA" : "LISÄÄ"}
-                    </Button>
-                </div>
-            </div>
-            {props.onItemDelete ?
+
                 <div className={styles.itemform_row}>
                     <div>
-                        <Button secondary onClick={handleDelete}>POISTA</Button>
+                        <Button onClick={handleCancel}>PERUUTA</Button>
                     </div>
-                    <div></div>
+                    <div>
+                        <Button primary
+                            disabled={values.type &&
+                                values.amount &&
+                                values.paymentDate &&
+                                values.receiver ? "" : "true"}
+                            type='submit'>
+                            {props.formData ? "TALLENNA" : "LISÄÄ"}
+                        </Button>
+                    </div>
                 </div>
-                : null}
-
+                {props.onItemDelete ?
+                    <div className={styles.itemform_row}>
+                        <div>
+                            <Button secondary onClick={handleDelete}>POISTA</Button>
+                        </div>
+                        <div></div>
+                    </div>
+                    : null}
+            </form>
         </div>
+
     )
 
 }

@@ -1,5 +1,7 @@
 import styles from './Stats.module.scss'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { LabelList, Legend, Pie, PieChart } from 'recharts'
+
 
 function Stats(props) {
   const locale = "fi-FI"; // Move this line up
@@ -11,6 +13,23 @@ function Stats(props) {
       amount: item.amount
     })
   );
+  const reducer = (resultData, item) => {
+    // Selvitetään löytyykö käsittelyn alla olevan alkion kulutyyppi
+    // jo tulostaulukosta.
+    const index = resultData.findIndex(arrayItem => arrayItem.type === item.type)
+    if (index >= 0) {
+      // Kulutyyppi löytyy tulostaulukosta, kasvatetaan kokonaissummaa.
+      resultData[index].amount = resultData[index].amount + item.amount
+    } else {
+      // Kulutyyppi ei löytynyt tulostaulukosta, lisätään se sinne.
+      resultData.push({ type: item.type, amount: item.amount })
+    }
+    // Palautetaan tulostaulukko.
+    return resultData
+  }
+
+  const piedata = props.data.reduce(reducer, [])
+
 
   return (
     <div className={styles.stats}>
@@ -34,6 +53,22 @@ function Stats(props) {
             } />
         </LineChart>
       </ResponsiveContainer>
+      <h3>Kulut kulutyypeittäin</h3>
+      <ResponsiveContainer height={350}>
+        <PieChart>
+          <Pie data={piedata} dataKey='amount' nameKey='type'>
+            <LabelList dataKey='amount'
+              position='inside'
+              formatter={
+                value => numberFormat.format(value)
+              } />
+          </Pie>
+          <Legend />
+          <Tooltip formatter={value => numberFormat.format(value)} />
+        </PieChart>
+
+      </ResponsiveContainer>
+
     </div>
   )
 }

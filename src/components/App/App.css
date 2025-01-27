@@ -1,0 +1,37 @@
+/* App.css */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    /* Full viewport height */
+    background-color: #f7f7f7;
+    /* Light background color */
+    text-align: center;
+}
+
+.login-container h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+    /* Dark text color */
+}
+
+.login-container button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #fff;
+    /* White text color */
+    background-color: #4285F4;
+    /* Google blue */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-container button:hover {
+    background-color: #357AE8;
+    /* Darker blue on hover */
+}

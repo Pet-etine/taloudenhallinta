@@ -1,13 +1,16 @@
+import './App.css'; // Import your CSS file
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 import firebase from './firebase.js'
 import { addDoc, collection, deleteDoc, doc, getFirestore, onSnapshot, orderBy, query, setDoc } from 'firebase/firestore'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import AppRouter from '../AppRouter'
-import { useState } from 'react'
 
 function App() {
   const [data, setData] = useState([])
   const [typelist, setTypelist] = useState([])
+  const [user, setUser] = useState(null) // Track user state
   const firestore = getFirestore(firebase)
+  const auth = getAuth(firebase)
 
   useEffect(() => {
     const unsubscribeTypes = onSnapshot(query(collection(firestore, 'type'), orderBy('type')), snapshot => {
@@ -61,13 +64,31 @@ function App() {
     }
   }
 
+  // Function to handle Google sign-in
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      setUser(result.user); // Set user state after successful sign-in
+    } catch (error) {
+      console.error("Error signing in with Google: ", error);
+    }
+  }
+
   return (
     <>
-      <AppRouter data={data}
-        typelist={typelist}
-        onItemSubmit={handleItemSubmit}
-        onItemDelete={handleItemDelete}
-        onTypeSubmit={handleTypeSubmit} />
+      {user ? (
+        <AppRouter data={data}
+          typelist={typelist}
+          onItemSubmit={handleItemSubmit}
+          onItemDelete={handleItemDelete}
+          onTypeSubmit={handleTypeSubmit} />
+      ) : (
+        <div className="login-container">
+          <h2>Please Sign In</h2>
+          <button onClick={handleGoogleSignIn}>Sign in with Google</button>
+        </div>
+      )}
     </>
   )
 }

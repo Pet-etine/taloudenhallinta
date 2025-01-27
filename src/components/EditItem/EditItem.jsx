@@ -4,13 +4,14 @@ import ItemForm from '../ItemForm/ItemForm'
 
 function EditItem(props) {
 
-    const data = useLoaderData()
+  const data = useLoaderData()
   return (
     <div className={styles.edititem}>
       <h2>Merkinnän muokkaaminen</h2>
-      <ItemForm onItemSubmit={props.onItemSubmit} 
-                onItemDelete={props.onItemDelete} 
-                formData={data.item} />
+      <ItemForm onItemSubmit={props.onItemSubmit}
+        onItemDelete={props.onItemDelete}
+        formData={data.item}
+        typelist={props.typelist} />
     </div>
   )
 

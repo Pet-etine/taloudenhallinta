@@ -32,6 +32,7 @@ function ItemForm(props) {
 
     const handleCancel = () => {
         navigate('/')
+
     }
     const handleDelete = () => {
         props.onItemDelete(values.id)
@@ -49,11 +50,12 @@ function ItemForm(props) {
                         <div>
                             <label htmlFor='type'>Kulutyyppi</label>
                             <select name='type' onChange={handleChange} value={values.type}>
-                                <option>Puhelin</option>
-                                <option>Sähkö</option>
-                                <option>Vesi</option>
-                                <option>Vero</option>
+                                <option value="">(valitse)</option>
+                                {props.typelist.map(
+                                    type => <option key={type}>{type}</option>
+                                )}
                             </select>
+
                         </div>
                     </div>
                     <div className={styles.itemform_row}>
@@ -93,7 +95,7 @@ function ItemForm(props) {
                             disabled={values.type &&
                                 values.amount &&
                                 values.paymentDate &&
-                                values.receiver ? "" : "true"}
+                                values.receiver ? "" : "disabled"}
                             type='submit'>
                             {props.formData ? "TALLENNA" : "LISÄÄ"}
                         </Button>

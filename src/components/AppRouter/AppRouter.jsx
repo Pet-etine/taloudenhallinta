@@ -21,7 +21,7 @@ function AppRouter(props) {
           element: <Items />,
           loader: () => { return props.data }
         },
-        { path: "stats", element: <Stats /> },
+        { path: "stats", element: <Stats data={props.data} /> },
         {
           path: "settings",
           element: <Settings typelist={props.typelist}

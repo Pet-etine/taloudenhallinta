@@ -1,10 +1,9 @@
 import styles from './Stats.module.scss'
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { LabelList, Legend, Pie, PieChart } from 'recharts'
-
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, LabelList, Legend, Pie, PieChart, Cell } from 'recharts'
+import randomColor from 'randomcolor'
 
 function Stats(props) {
-  const locale = "fi-FI"; // Move this line up
+  const locale = "fi-FI";
   const numberFormat = new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' });
 
   const linedata = props.data.map(
@@ -13,23 +12,23 @@ function Stats(props) {
       amount: item.amount
     })
   );
+
   const reducer = (resultData, item) => {
-    // Selvitetään löytyykö käsittelyn alla olevan alkion kulutyyppi
-    // jo tulostaulukosta.
-    const index = resultData.findIndex(arrayItem => arrayItem.type === item.type)
+    const index = resultData.findIndex(arrayItem => arrayItem.type === item.type);
     if (index >= 0) {
-      // Kulutyyppi löytyy tulostaulukosta, kasvatetaan kokonaissummaa.
-      resultData[index].amount = resultData[index].amount + item.amount
+      resultData[index].amount += item.amount;
     } else {
-      // Kulutyyppi ei löytynyt tulostaulukosta, lisätään se sinne.
-      resultData.push({ type: item.type, amount: item.amount })
+      resultData.push({ type: item.type, amount: item.amount });
     }
-    // Palautetaan tulostaulukko.
-    return resultData
+    return resultData;
   }
 
-  const piedata = props.data.reduce(reducer, [])
-
+  const piedata = props.data.reduce(reducer, []);
+  const piecolors = randomColor({
+    count: piedata.length,
+    seed: 'siemenluku',
+    luminosity: 'dark'
+  });
 
   return (
     <div className={styles.stats}>
@@ -57,6 +56,9 @@ function Stats(props) {
       <ResponsiveContainer height={350}>
         <PieChart>
           <Pie data={piedata} dataKey='amount' nameKey='type'>
+            {piedata.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={piecolors[index]} />
+            ))}
             <LabelList dataKey='amount'
               position='inside'
               formatter={
@@ -66,9 +68,7 @@ function Stats(props) {
           <Legend />
           <Tooltip formatter={value => numberFormat.format(value)} />
         </PieChart>
-
       </ResponsiveContainer>
-
     </div>
   )
 }

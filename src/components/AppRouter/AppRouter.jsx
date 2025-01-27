@@ -22,11 +22,13 @@ function AppRouter(props) {
           loader: () => { return props.data }
         },
         { path: "stats", element: <Stats data={props.data} /> },
-        {
-          path: "settings",
-          element: <Settings typelist={props.typelist}
-            onTypeSubmit={props.onTypeSubmit} />
-        },
+        
+          { path: "settings",
+            element: <Settings typelist={props.typelist}
+                               onTypeSubmit={props.onTypeSubmit}
+                               user={props.user}
+                               auth={props.auth} /> }
+  ,
         {
           path: "add",
           element: <AddItem onItemSubmit={props.onItemSubmit}

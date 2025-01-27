@@ -1,5 +1,5 @@
 import firebase from './firebase.js'
-import { collection, getFirestore, onSnapshot  } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getFirestore, onSnapshot, setDoc } from 'firebase/firestore'
 import { useEffect } from 'react'
 import testdata from './testdata.js'
 import AppRouter from '../AppRouter'
@@ -13,26 +13,25 @@ function App() {
   const [data, setData] = useState([])
   const [typelist, setTypelist] = useLocalStorage('taloudenhallinta-typelist', [])
   const firestore = getFirestore(firebase)
-  useEffect( () => {
-    const unsubscribe = onSnapshot(collection(firestore,'item'), snapshot => {
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(firestore, 'item'), snapshot => {
       const newData = []
-      snapshot.forEach( doc => {
+      snapshot.forEach(doc => {
         newData.push({ ...doc.data(), id: doc.id })
       })
-      setData(newData)    
+      setData(newData)
     })
     return unsubscribe
   }, [])
 
 
 
-  const handleItemDelete = (id) => {
-    let copy = data.slice()
-    copy = copy.filter(item => item.id !== id)
-    setData(copy)
+  const handleItemDelete = async (id) => {
+    await deleteDoc(doc(firestore, 'item', id))
   }
 
-  const handleItemSubmit = (newitem) => {
+  const handleItemSubmit = async (newitem) => {
+    await setDoc(doc(firestore, 'item', newitem.id), newitem)
     let copy = data.slice()
 
     const index = copy.findIndex(item => item.id === newitem.id)

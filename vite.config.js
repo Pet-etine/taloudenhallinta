@@ -8,6 +8,7 @@ import manifest from './manifest.json'
 export default defineConfig({
   plugins: [react(),
   VitePWA({ manifest: manifest })],
+  outDir: 'dist',
   test: {
     globals: true,
     environment: 'jsdom',

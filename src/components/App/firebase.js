@@ -1,9 +1,8 @@
 // Import Firebase functions
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore";  // Firestore DB
-import { getDatabase } from "firebase/database";  // Realtime DB
-import { getAuth } from "firebase/auth";  // Authentication
+import { getFirestore } from "firebase/firestore";
+import { getDatabase } from "firebase/database";
+
 
 // Firebase configuration
 const firebaseConfig = {
@@ -18,11 +17,10 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const auth = getAuth(app);
-const db = getDatabase(app); // ✅ Initialize the database instance
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getDatabase(firebaseApp);  // Realtime Database
+const firestore = getFirestore(firebaseApp); // Firestore for document storage
 
-// Export Firebase instances
-export { app, analytics, auth, db }; // ✅ Export db
-export default app;
+// ✅ Export as named exports
+export { firebaseApp, db, firestore };
+export default firebaseApp;

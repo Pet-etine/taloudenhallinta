@@ -4,12 +4,12 @@ import { db } from "../components/App/firebase"; // Import db from your firebase
 const uploadData = async (data) => {
     console.log("🔍 Debug: Received data:", data);
 
-    // Extract specific key from the JSON object
+    // Extract the correct key from JSON
     if (!Array.isArray(data)) {
         if (data["All Items _Entire List_"] && Array.isArray(data["All Items _Entire List_"])) {
-            data = data["All Items _Entire List_"];  // Use only the items array
+            data = data["All Items _Entire List_"];
         } else {
-            console.error("❌ Error: Could not extract valid item list from JSON!", data);
+            console.error("❌ Error: Data is not a valid array!", data);
             return;
         }
     }
@@ -25,6 +25,5 @@ const uploadData = async (data) => {
         console.error("❌ Error uploading data:", error);
     }
 };
-
 
 export default uploadData;

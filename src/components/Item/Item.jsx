@@ -1,31 +1,26 @@
-import React from 'react';
-import styles from './Item.module.scss';
+import styles from "../Items/Items.module.scss";  // If the file is inside the Items folder
+import { FloatingButton } from '../../shared/buttons';
+import Item from '../Item/Item';
+import { Link } from 'react-router-dom';
 
-const Item = ({ data }) => {
-  // Check if data is an array
-  const isArray = Array.isArray(data);
+function Items({ items = [] }) { // Ensure items is always an array
+  if (!Array.isArray(items)) {
+    console.error("❌ Error: items is not an array!", items);
+    return <div>Error loading items.</div>;
+  }
 
   return (
-    <div className={styles.itemList}>
-      {isArray ? (
-        data.map((item, index) => (
-          <div key={index} className={styles.item}>
-            <p><strong>Form Type:</strong> {item["Form Type"] || "Unknown"}</p>
-            <p><strong>Form ID:</strong> {item["Form ID"] || "No ID"}</p>
-            <p><strong>Full Name:</strong> {item["Full Name"] || "No Name"}</p>
-            <p><strong>Editor ID:</strong> {item["Editor ID"] || "No Editor"}</p>
-          </div>
-        ))
+    <div className={styles.items}>
+      {items.length === 0 ? (
+        <p>No items available</p>
       ) : (
-        <div className={styles.item}>
-          <p><strong>Form Type:</strong> {data["Form Type"] || "Unknown"}</p>
-          <p><strong>Form ID:</strong> {data["Form ID"] || "No ID"}</p>
-          <p><strong>Full Name:</strong> {data["Full Name"] || "No Name"}</p>
-          <p><strong>Editor ID:</strong> {data["Editor ID"] || "No Editor"}</p>
-        </div>
+        items.map((item, index) => <Item key={index} data={item} />)
       )}
+      <Link to="/add">
+        <FloatingButton secondary>+</FloatingButton>
+      </Link>
     </div>
   );
-};
+}
 
-export default Item;
+export default Items;

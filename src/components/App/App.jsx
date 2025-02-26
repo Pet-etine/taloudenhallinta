@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react';
 import AppRouter from '../AppRouter';
 import fetchData from "../../services/uploadData"; // Adjust path if necessary
 import uploadData from "../../services/uploadData";
-import { ref, set } from "firebase/database";  // ✅ Import ref and set from Firebase Database
-import { db } from "./firebase";  // ✅ Import db instance from firebase.js
+import { getDatabase, ref, get, onValue, child } from "firebase/database"; // Import correct methods
+import { firebaseApp, db, firestore } from "./firebase";  // ✅ Correct import
 
 function App() {
   const [data, setData] = useState([]);
@@ -21,14 +21,24 @@ function App() {
   useEffect(() => {
     const uploadDataJson = async () => {
       try {
-        const response = await fetch('/data.json'); // Fetch JSON from public folder
-        const dataToUpload = await response.json(); // Convert to JavaScript object
-        await uploadData(dataToUpload);
-        console.log("Data uploaded successfully!");
+          const response = await fetch("/data.json");
+          const jsonData = await response.json();
+  
+          if (!Array.isArray(jsonData)) {
+              console.error("❌ Error: Data is not an array!", jsonData);
+              return;
+          }
+  
+          console.log("📤 Uploading data to Firebase...");
+          await uploadData(jsonData);
+          console.log("✅ Data uploaded successfully!");
+  
+          // Fetch items after uploading
+          fetchItems();
       } catch (error) {
-        console.error("Error loading data.json:", error);
+          console.error("❌ Error loading data.json:", error);
       }
-    };
+  };
 
     if (user) {
       uploadDataJson(); // Call the upload function if the user is signed in
@@ -57,18 +67,22 @@ function App() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await fetch('/data.json');
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setItems(data);
-          console.log("✅ Loaded items:", data);
-        } else {
-          console.error("❌ Data is not an array!", data);
-        }
+          const dbRef = ref(db);
+          const snapshot = await get(child(dbRef, "items"));
+          
+          if (snapshot.exists()) {
+              const itemsArray = Object.values(snapshot.val());
+              setItems(itemsArray);
+              console.log("✅ Loaded items from Firebase:", itemsArray);
+          } else {
+              console.log("⚠️ No items found in Firebase.");
+              setItems([]); // Ensure items is always an array
+          }
       } catch (error) {
-        console.error("❌ Error fetching data.json:", error);
+          console.error("❌ Error fetching items:", error);
       }
-    };
+  };
+  
 
     const unsubscribeItems = onSnapshot(
       query(collection(firestore, 'item'), orderBy('paymentDate')),
@@ -91,6 +105,26 @@ function App() {
     }; // Cleanup listener
   }, [firestore, user]); // Now it listens to user state as well
 
+  // Real-time listener for items
+  useEffect(() => {
+    const db = getDatabase(firebaseApp);
+    const itemsRef = ref(db, "items");
+
+    // Listen for real-time changes
+    onValue(itemsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const formattedData = Object.entries(data).map(([id, value]) => ({
+          id,
+          ...value
+        }));
+        setItems(formattedData);
+      } else {
+        setItems([]); // Set an empty array if no data
+      }
+    });
+  }, []);
+
   const handleItemDelete = async id => {
     if (user) {
       await deleteDoc(doc(firestore, `user/${user.uid}/item`, id));
@@ -99,15 +133,15 @@ function App() {
 
   const handleItemSubmit = (newItem) => {
     console.log("✅ Item received from form:", newItem);
-  
+
     setItems((prevItems) => {
       const updatedItems = [...prevItems, newItem];
       console.log("📌 Updated items list:", updatedItems);
       return updatedItems;
     });
-  
+
     try {
-      const database = getDatabase();
+      const database = getDatabase(); // Get Firebase database reference
       set(ref(database, `items/${newItem["Form ID"]}`), newItem)
         .then(() => console.log("✅ Data saved successfully!"))
         .catch((error) => console.error("❌ Error saving item to Firebase:", error));

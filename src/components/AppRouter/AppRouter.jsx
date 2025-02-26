@@ -1,13 +1,12 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import ErrorPage from '../ErrorPage'
-import Items from '../Items'
-import Root from '../Root'
-import Settings from '../Settings'
-import Stats from '../Stats'
-import AddItem from '../AddItem'
-import EditItem from '../EditItem'
-
-
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import ErrorPage from '../ErrorPage';
+import Items from '../Items';
+import Root from '../Root';
+import Settings from '../Settings';
+import Stats from '../Stats';
+import AddItem from '../AddItem';
+import EditItem from '../EditItem';
+import React from "react";
 
 function AppRouter(props) {
   const router = createBrowserRouter([
@@ -18,46 +17,52 @@ function AppRouter(props) {
       children: [
         {
           path: "",
-          element: <Items />,
+          element: <Items items={props.items} />,  // Pass items here
           loader: () => { return props.data }
         },
-        { path: "stats", element: <Stats data={props.data} /> },
-        
-          { path: "settings",
-            element: <Settings typelist={props.typelist}
-                               onTypeSubmit={props.onTypeSubmit}
-                               user={props.user}
-                               auth={props.auth} /> }
-  ,
+        { 
+          path: "stats", 
+          element: <Stats data={props.data} /> 
+        },
+        { 
+          path: "settings",
+          element: <Settings 
+            typelist={props.typelist}
+            onTypeSubmit={props.onTypeSubmit}
+            user={props.user}
+            auth={props.auth} 
+          /> 
+        },
         {
           path: "add",
-          element: <AddItem onItemSubmit={props.onItemSubmit}
-            typelist={props.typelist} />
+          element: <AddItem 
+            onItemSubmit={props.onItemSubmit}
+            typelist={props.typelist} 
+          />
         },
-
         {
           path: "edit/:id",
-          element: <EditItem onItemSubmit={props.onItemSubmit}
+          element: <EditItem 
+            onItemSubmit={props.onItemSubmit}
             onItemDelete={props.onItemDelete}
-            typelist={props.typelist} />,
+            typelist={props.typelist} 
+          />,
           loader: ({ params }) => {
-            const item = props.data.filter(item => item.id === params.id).shift()
+            const item = props.data.filter(item => item.id === params.id).shift();
             if (item) {
-              return { item }
+              return { item };
             } else {
-              throw new Response("Not Found", { status: 404 })
+              throw new Response("Not Found", { status: 404 });
             }
           }
         },
-
       ]
     }
-  ])
-
+  ]);
 
   return (
     <RouterProvider router={router} />
-  )
+  );
 }
 
-export default AppRouter
+export default AppRouter;

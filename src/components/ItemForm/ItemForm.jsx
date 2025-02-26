@@ -1,46 +1,63 @@
-import styles from './ItemForm.module.scss'
-import useForm from '../../shared/useform/useform'
-import Button from '../../shared/buttons'
-import { useNavigate } from 'react-router-dom'
-
-
-
+import styles from './ItemForm.module.scss';
+import useForm from '../../shared/useform/useform';
+import Button from '../../shared/buttons';
+import { useNavigate } from 'react-router-dom';
 
 function ItemForm(props) {
-
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const submit = () => {
-        let storedValues = Object.assign({}, values)
-        storedValues.amount = parseFloat(storedValues.amount)
-        storedValues.id = storedValues.id ? storedValues.id : crypto.randomUUID()
-        props.onItemSubmit(storedValues)
-        navigate(-1)
-    }
-
+        let storedValues = { ...values };
+        storedValues["Form ID"] = storedValues["Form ID"] ? storedValues["Form ID"] : crypto.randomUUID(); // Ensure Form ID exists
+        
+        console.log("🔍 Debug: Submitting item to main page:", storedValues);
+    
+        if (props.onItemSubmit) {
+            props.onItemSubmit(storedValues);  // ✅ Send data to main page
+        } else {
+            console.error("❌ Error: onItemSubmit function is missing!");
+        }
+    
+        setValues({ "Form Type": "", "Form ID": "", "Full Name": "", "Editor ID": "" });  // ✅ Clear form after submit
+    };
+    
 
     const initialState = props.formData ? props.formData : {
-        type: "",
-        amount: 0,
-        paymentDate: "",
-        periodStart: "",
-        periodEnd: "",
-        receiver: ""
-    }
+        "Form Type": "",
+        "Form ID": "",
+        "Full Name": "",
+        "Editor ID": ""
+    };
 
-    const { values, handleChange, handleSubmit } = useForm(submit, initialState, false)
+    const { values, handleChange, handleSubmit, setValues } = useForm(submit, initialState, false);
 
     const handleCancel = () => {
-        navigate('/')
+        navigate('/');
+    };
 
-    }
-    const handleDelete = () => {
-        props.onItemDelete(values.id)
-        navigate(-1)
-    }
-
-
-
+    const loadData = async () => {
+        try {
+            const response = await fetch("/data.json");
+            if (!response.ok) throw new Error("Failed to load data.json");
+    
+            const jsonData = await response.json();
+            
+            if (jsonData.length > 0) {
+                const firstItem = jsonData[0]; // Load first item for now
+    
+                // Use setValues to update the form values
+                setValues({
+                    "Form Type": firstItem["Form Type"] || "",
+                    "Form ID": firstItem["Form ID"] || "",
+                    "Full Name": firstItem["Full Name"] || "",
+                    "Editor ID": firstItem["Editor ID"] || "",
+                });
+            }
+        } catch (error) {
+            console.error("❌ Error loading data.json:", error);
+        }
+    };
+    
 
     return (
         <div>
@@ -48,80 +65,48 @@ function ItemForm(props) {
                 <div className={styles.itemform}>
                     <div className={styles.itemform_row}>
                         <div>
-                            <label htmlFor='type'>Kulutyyppi</label>
-                            <select id='type' name='type' onChange={handleChange} value={values.type}>
-                                <option value="">(valitse)</option>
-                                {props.typelist.map(
-                                    type => <option key={type}>{type}</option>
-                                )}
-                            </select>
-
-
+                            <label htmlFor='formType'>Form Type</label>
+                            <input id='formType' type='text' name='Form Type' onChange={handleChange} value={values["Form Type"]} />
                         </div>
                     </div>
                     <div className={styles.itemform_row}>
                         <div>
-                            <label htmlFor='amount'>Summa</label>
-                            <input id='amount' type='number' name='amount' step='0.01' onChange={handleChange} value={values.amount} />
-
-                        </div>
-                        <div>
-                            <label htmlFor='paymentDate'>Maksupäivä</label>
-                            <input id='paymentDate' type='date' name='paymentDate' onChange={handleChange} value={values.paymentDate} />
-
-
-
+                            <label htmlFor='formId'>Form ID</label>
+                            <input id='formId' type='text' name='Form ID' onChange={handleChange} value={values["Form ID"]} />
                         </div>
                     </div>
                     <div className={styles.itemform_row}>
                         <div>
-                            <label htmlFor='periodStart'>Laskutuskauden alku</label>
-                            <input id='periodStart' type='date' name='periodStart' onChange={handleChange} value={values.periodStart} />
-
-                        </div>
-                        <div>
-                            <label htmlFor='periodEnd'>Laskutuskauden loppu</label>
-                            <input id='periodEnd' type='date' name='periodEnd' onChange={handleChange} value={values.periodEnd} />
-
+                            <label htmlFor='fullName'>Full Name</label>
+                            <input id='fullName' type='text' name='Full Name' onChange={handleChange} value={values["Full Name"]} />
                         </div>
                     </div>
                     <div className={styles.itemform_row}>
                         <div>
-                            <label htmlFor='receiver'>Saaja</label>
-                            <input id='receiver' type='text' name='receiver' onChange={handleChange} value={values.receiver} />
-
+                            <label htmlFor='editorId'>Editor ID</label>
+                            <input id='editorId' type='text' name='Editor ID' onChange={handleChange} value={values["Editor ID"]} />
                         </div>
                     </div>
                 </div>
 
                 <div className={styles.itemform_row}>
                     <div>
-                        <Button onClick={handleCancel}>PERUUTA</Button>
+                        <Button onClick={handleCancel}>CANCEL</Button>
                     </div>
                     <div>
-                        <Button primary
-                            disabled={values.type &&
-                                values.amount &&
-                                values.paymentDate &&
-                                values.receiver ? "" : "disabled"}
-                            type='submit'>
-                            {props.formData ? "TALLENNA" : "LISÄÄ"}
+                        <Button onClick={loadData} type='button'>
+                            LOAD DATA
+                        </Button>
+                    </div>
+                    <div>
+                        <Button primary disabled={!values["Form Type"] || !values["Form ID"] || !values["Full Name"] || !values["Editor ID"]} type='submit'>
+                            {props.formData ? "SAVE" : "ADD"}
                         </Button>
                     </div>
                 </div>
-                {props.onItemDelete ?
-                    <div className={styles.itemform_row}>
-                        <div>
-                            <Button secondary onClick={handleDelete}>POISTA</Button>
-                        </div>
-                        <div></div>
-                    </div>
-                    : null}
             </form>
         </div>
-
-    )
-
+    );
 }
 
-export default ItemForm
+export default ItemForm;

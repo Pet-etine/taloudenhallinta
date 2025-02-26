@@ -1,41 +1,31 @@
-import styles from './Item.module.scss'
-import { MdNavigateNext } from 'react-icons/md'
-import { Link } from 'react-router-dom'
+import React from 'react';
+import styles from './Item.module.scss';
 
-
-function Item({ data, ...props }) {
-
-  const locale = "fi-FI"
-  const paymentDate = new Date(data.paymentDate).toLocaleDateString(locale)
-  const numberFormat = new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' })
-  const amount = numberFormat.format(data.amount)
-    let average
-  let period
-
-  if (data.periodStart && data.periodEnd) {
-    const periodStart = new Date(data.periodStart)
-    const periodEnd = new Date(data.periodEnd)
-    period = periodStart.toLocaleDateString(locale) + " - " + periodEnd.toLocaleDateString(locale)
-    const days = (periodEnd - periodStart) / (24*60*60*1000)
-    average = numberFormat.format(data.amount / days * 30)
-  }
-
+const Item = ({ data }) => {
+  // Check if data is an array
+  const isArray = Array.isArray(data);
 
   return (
-    <div className={styles.item}>
-      <div className={styles.item_data}>
-        <div className={styles.item_type}>{data.type}</div>
-        <div className={styles.item_amount}>{amount}</div>
-        <div className={styles.item_date}>{paymentDate}</div>
-        <div className={styles.item_timespan}>{period}</div>
-        <div className={styles.item_receiver}>{data.receiver}</div>
-        <div className={styles.item_average}>{average ? average + "/kk" : ""}</div>
-      </div>
-      <div className={styles.item_edit}>
-        <Link to={"/edit/" + data.id}><MdNavigateNext /></Link>
-      </div>
+    <div className={styles.itemList}>
+      {isArray ? (
+        data.map((item, index) => (
+          <div key={index} className={styles.item}>
+            <p><strong>Form Type:</strong> {item["Form Type"] || "Unknown"}</p>
+            <p><strong>Form ID:</strong> {item["Form ID"] || "No ID"}</p>
+            <p><strong>Full Name:</strong> {item["Full Name"] || "No Name"}</p>
+            <p><strong>Editor ID:</strong> {item["Editor ID"] || "No Editor"}</p>
+          </div>
+        ))
+      ) : (
+        <div className={styles.item}>
+          <p><strong>Form Type:</strong> {data["Form Type"] || "Unknown"}</p>
+          <p><strong>Form ID:</strong> {data["Form ID"] || "No ID"}</p>
+          <p><strong>Full Name:</strong> {data["Full Name"] || "No Name"}</p>
+          <p><strong>Editor ID:</strong> {data["Editor ID"] || "No Editor"}</p>
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Item
+export default Item;

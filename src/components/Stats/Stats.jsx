@@ -1,76 +1,49 @@
-import styles from './Stats.module.scss'
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, LabelList, Legend, Pie, PieChart, Cell } from 'recharts'
-import randomColor from 'randomcolor'
+import React from 'react';
+import styles from './Stats.module.scss';
 
-function Stats(props) {
-  const locale = "fi-FI";
-  const numberFormat = new Intl.NumberFormat(locale, { style: 'currency', currency: 'EUR' });
+function Stats({ data = [] }) {
+  console.log("📊 Received data:", data); // Debugging log
 
-  const linedata = props.data.map(
-    (item) => ({
-      date: new Date(item.paymentDate).getTime(),
-      amount: item.amount
-    })
-  );
+  // Ensure data is an array
+  const itemsArray = Array.isArray(data) ? data : [];
 
-  const reducer = (resultData, item) => {
-    const index = resultData.findIndex(arrayItem => arrayItem.type === item.type);
-    if (index >= 0) {
-      resultData[index].amount += item.amount;
-    } else {
-      resultData.push({ type: item.type, amount: item.amount });
-    }
-    return resultData;
-  }
+  console.log("✅ Using dataset with", itemsArray.length, "items"); // Debugging log
 
-  const piedata = props.data.reduce(reducer, []);
-  const piecolors = randomColor({
-    count: piedata.length,
-    seed: 'siemenluku',
-    luminosity: 'dark'
-  });
+  const totalItems = itemsArray.length;
+  const typeCounts = itemsArray.reduce((acc, item) => {
+    acc[item.type] = (acc[item.type] || 0) + 1;
+    return acc;
+  }, {});
+
+  const formTypeCounts = itemsArray.reduce((acc, item) => {
+    acc[item["Form Type"]] = (acc[item["Form Type"]] || 0) + 1;
+    return acc;
+  }, {});
+
+  const uniqueEditors = new Set(itemsArray.map(item => item["Editor ID"])).size;
 
   return (
     <div className={styles.stats}>
-      <h2>Tilastot</h2>
-      <h3>Kulut aikajanalla</h3>
-      <ResponsiveContainer height={350}>
-        <LineChart data={linedata}>
-          <Line dataKey='amount' />
-          <XAxis type='number'
-            dataKey='date'
-            domain={['dataMin', 'dataMax']}
-            tickFormatter={
-              value => new Date(value).toLocaleDateString(locale)
-            } />
-          <YAxis />
-          <Tooltip labelFormatter={
-            value => new Date(value).toLocaleDateString(locale)
-          }
-            formatter={
-              value => [numberFormat.format(value), "maksettu"]
-            } />
-        </LineChart>
-      </ResponsiveContainer>
-      <h3>Kulut kulutyypeittäin</h3>
-      <ResponsiveContainer height={350}>
-        <PieChart>
-          <Pie data={piedata} dataKey='amount' nameKey='type'>
-            {piedata.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={piecolors[index]} />
-            ))}
-            <LabelList dataKey='amount'
-              position='inside'
-              formatter={
-                value => numberFormat.format(value)
-              } />
-          </Pie>
-          <Legend />
-          <Tooltip formatter={value => numberFormat.format(value)} />
-        </PieChart>
-      </ResponsiveContainer>
+      <h2>Statistics</h2>
+      <h3>General Information</h3>
+      <p><strong>Total Items:</strong> {totalItems}</p>
+      <p><strong>Unique Editors:</strong> {uniqueEditors}</p>
+      
+      <h4>Item Distribution by Type</h4>
+      <ul>
+        {Object.entries(typeCounts).map(([type, count]) => (
+          <li key={type}><strong>{type}:</strong> {count} items</li>
+        ))}
+      </ul>
+      
+      <h4>Item Distribution by Form Type</h4>
+      <ul>
+        {Object.entries(formTypeCounts).map(([formType, count]) => (
+          <li key={formType}><strong>{formType}:</strong> {count} items</li>
+        ))}
+      </ul>
     </div>
-  )
+  );
 }
 
-export default Stats
+export default Stats;

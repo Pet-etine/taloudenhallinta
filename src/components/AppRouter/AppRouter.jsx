@@ -22,7 +22,7 @@ function AppRouter(props) {
         },
         { 
           path: "stats", 
-          element: <Stats data={props.data} /> 
+          element: <Stats data={props.items} /> 
         },
         { 
           path: "settings",

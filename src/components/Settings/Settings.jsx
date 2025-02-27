@@ -1,16 +1,9 @@
-import styles from './Settings.module.scss'
-import Button from '../../shared/buttons'
-import { signOut } from 'firebase/auth'
-
+import styles from './Settings.module.scss';
+import Button from '../../shared/buttons';
+import { signOut, getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 function Settings(props) {
 
-  const handleTypeSubmit = (event) => {
-    event.preventDefault()
-    const newtype = event.target.elements.type.value
-    props.onTypeSubmit(newtype)
-    event.target.elements.type.value = ''
-  }
   const logout = async () => {
     console.log("Logout button clicked");
     try {
@@ -20,38 +13,43 @@ function Settings(props) {
     } catch (error) {
       console.error("Logout error: ", error);
     }
-  }
+  };
+
+  const switchAccount = async () => {
+    console.log("Switch Account button clicked");
+    try {
+      await signOut(props.auth); // Sign out the current user
+      const provider = new GoogleAuthProvider();
+      const auth = getAuth();
+      const result = await signInWithPopup(auth, provider); // Prompt login for a new account
+      console.log("Switched to account:", result.user.email);
+      window.location.reload();
+    } catch (error) {
+      console.error("Switch account error: ", error);
+    }
+  };
 
   return (
     <div className={styles.settings}>
-      <h2>Asetukset</h2>
-      <h3>Profiili</h3>
+      <h2>Settings</h2>
+      <h3>Profile</h3>
       <div className={styles.settings_profile}>
         <div className={styles.settings_user}>
-          <div><img src={props.user.photoURL} /></div>
+          <div><img src={props.user.photoURL} alt="User Avatar" /></div>
           <div>{props.user.displayName}<br />
             {props.user.email}</div>
         </div>
         <div>
-          <Button primary onClick={logout}>Kirjaudu ulos</Button>
-
+          <Button primary onClick={logout}>Log Out</Button>
         </div>
       </div>
 
-      <div className={styles.settings_types}>
-        {props.typelist.map(
-          type => <div key={type}>{type}</div>
-
-        )}                <form onSubmit={handleTypeSubmit}>
-          <div className={styles.settings_form}>
-            <input type='text' name='type' />
-            <Button type='submit' primary>Lisää</Button>
-          </div>
-        </form>
-
+      <div className={styles.settings_actions}>
+        <h3>Actions</h3>
+        <Button primary onClick={switchAccount}>Switch Account</Button>
       </div>
     </div>
-  )
+  );
 }
 
-export default Settings
+export default Settings;

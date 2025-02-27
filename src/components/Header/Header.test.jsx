@@ -5,7 +5,7 @@ describe('Header', () => {
   test('Komponentti renderöityy tekstillä', () => {
     render(<Header />)
 
-    const header = screen.getByText('Taloudenhallinta')
+    const header = screen.getByText('OblivionIDSearch')
     expect(header).toBeInTheDocument()
   })
 })

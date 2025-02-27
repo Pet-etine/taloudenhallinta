@@ -1,12 +1,12 @@
 import './App.css'; // Import your CSS file
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import firebase from './firebase.js';
-import { addDoc, collection, deleteDoc, doc, getFirestore, onSnapshot, orderBy, query, setDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getFirestore, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import AppRouter from '../AppRouter';
 import fetchData from "../../services/uploadData"; // Adjust path if necessary
 import uploadData from "../../services/uploadData";
-import { getDatabase, ref, get, onValue, child } from "firebase/database"; // Import correct methods
+import { getDatabase, ref, get, onValue, child, set } from "firebase/database"; // Import correct methods
 import { firebaseApp, db, firestore } from "./firebase";  // ✅ Correct import
 
 function App() {
@@ -64,46 +64,54 @@ function App() {
     }
   }, [user, firestore]);
 
+  // Optimized fetchItems logic
   useEffect(() => {
     const fetchItems = async () => {
       try {
-          const dbRef = ref(db);
-          const snapshot = await get(child(dbRef, "items"));
-          
-          if (snapshot.exists()) {
-              const itemsArray = Object.values(snapshot.val());
-              setItems(itemsArray);
-              console.log("✅ Loaded items from Firebase:", itemsArray);
-          } else {
-              console.log("⚠️ No items found in Firebase.");
-              setItems([]); // Ensure items is always an array
-          }
+        const dbRef = ref(db);
+        const snapshot = await get(child(dbRef, "items"));
+        
+        if (snapshot.exists()) {
+          const itemsArray = Object.values(snapshot.val());
+
+          // ✅ Prevent unnecessary updates if data hasn't changed
+          setItems((prevItems) => {
+            if (JSON.stringify(prevItems) !== JSON.stringify(itemsArray)) {
+              return itemsArray;
+            }
+            return prevItems; 
+          });
+
+          if (process.env.NODE_ENV === 'development') {
+            console.log("✅ Loaded items from Firebase:", itemsArray);
+          }              
+        } else {
+          console.log("⚠️ No items found in Firebase.");
+          setItems([]); 
+        }
       } catch (error) {
-          console.error("❌ Error fetching items:", error);
+        console.error("❌ Error fetching items:", error);
       }
-  };
-  
+    };
 
-    const unsubscribeItems = onSnapshot(
-      query(collection(firestore, 'item'), orderBy('paymentDate')),
-      snapshot => {
-        const newData = [];
-        snapshot.forEach(doc => {
-          newData.push({ id: doc.id, ...doc.data() });
-        });
-        setData(newData);
-      },
-      error => {
-        console.error('Error fetching items: ', error);
-      }
-    );
+    if (!items.length) { // ✅ Only fetch if items is empty
+      fetchItems();
+    }
+  }, [items]); // ✅ Depend only on `items`
 
-    fetchItems(); // Fetch items when the component mounts
-
-    return () => {
-      unsubscribeItems(); // Cleanup listener
-    }; // Cleanup listener
-  }, [firestore, user]); // Now it listens to user state as well
+  const unsubscribeItems = onSnapshot(
+    query(collection(firestore, 'item'), orderBy('paymentDate')),
+    snapshot => {
+      const newData = [];
+      snapshot.forEach(doc => {
+        newData.push({ id: doc.id, ...doc.data() });
+      });
+      setData(newData);
+    },
+    error => {
+      console.error('Error fetching items: ', error);
+    }
+  );
 
   // Real-time listener for items
   useEffect(() => {
@@ -123,6 +131,10 @@ function App() {
         setItems([]); // Set an empty array if no data
       }
     });
+
+    return () => {
+      unsubscribeItems(); // Cleanup listener
+    };
   }, []);
 
   const handleItemDelete = async id => {

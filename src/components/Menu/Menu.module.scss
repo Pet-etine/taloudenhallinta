@@ -1,8 +1,8 @@
 @import '../../assets/styles/_config.scss';
 
 .menu {
-    background-color: $color-neutral-darker;
-    color: $color-neutral-lighter;
+    background-color: tan;
+    color: black;
     max-height: 4rem;
     min-height: 4rem;
     font-size: 2rem;
@@ -27,9 +27,9 @@
 }
 
 .menu a {
-    color: $color-neutral-light;
+    color: black;
 
     &:global.active {
-        color: $color-neutral-lightest;
+        color: red;
     }
 }

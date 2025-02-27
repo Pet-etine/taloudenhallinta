@@ -8,6 +8,7 @@ import { FaSearch } from "react-icons/fa";
 const Items = ({ items = [] }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
+  const [visibleItems, setVisibleItems] = useState(10); // Show only 10 items initially
 
   // Filter items based on search query
   const filteredItems = items.filter((item) =>
@@ -15,6 +16,11 @@ const Items = ({ items = [] }) => {
       item[key]?.toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
+
+  // Load more items when button is clicked
+  const loadMore = () => {
+    setVisibleItems((prev) => prev + 10);
+  };
 
   return (
     <div className="items-container">
@@ -33,6 +39,7 @@ const Items = ({ items = [] }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={styles.searchBar}
+            style={{ width: '95%', height: '40px', fontSize: '18px', padding: '10px' }}
           />
         </div>
       )}
@@ -40,14 +47,21 @@ const Items = ({ items = [] }) => {
       {filteredItems.length === 0 ? (
         <p>No items match your search.</p>
       ) : (
-        filteredItems.map((item, index) => (
-          <div key={index} className="item-card">
-            <h3>{item["Full Name"] || "Unnamed Item"}</h3>
-            <p><strong>Form Type:</strong> {item["Form Type"]}</p>
-            <p><strong>Form ID:</strong> {item["Form ID"]}</p>
-            <p><strong>Editor ID:</strong> {item["Editor ID"]}</p>
-          </div>
-        ))
+        <>
+          {filteredItems.slice(0, visibleItems).map((item, index) => (
+            <div key={index} className="item-card">
+              <h3>{item["Full Name"] || "Unnamed Item"}</h3>
+              <p><strong>Form Type:</strong> {item["Form Type"]}</p>
+              <p><strong>Form ID:</strong> {item["Form ID"]}</p>
+              <p><strong>Editor ID:</strong> {item["Editor ID"]}</p>
+            </div>
+          ))}
+          {visibleItems < filteredItems.length && (
+            <button onClick={loadMore} className={styles.loadMoreButton}>
+              Load More
+            </button>
+          )}
+        </>
       )}
     </div>
   );

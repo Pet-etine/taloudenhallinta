@@ -1,3 +1,21 @@
 .items {
     padding-bottom: 4rem;
   }
+  .loadMoreButton {
+    font-size: 18px;
+    padding: 15px 30px;
+    position: relative;
+    top: -10px; /* Moves the button UP */
+    left: 10px;  /* Moves the button to the RIGHT */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.loadMoreButton:hover {
+    background-color: #0056b3;
+    transform: scale(1.1);
+}

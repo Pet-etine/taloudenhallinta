@@ -1,0 +1,55 @@
+@import '../../assets/styles/_config.scss';
+
+.settings {
+    padding: $container-padding;
+}
+
+.settings h3 {
+    margin-top: 0.5rem;
+    margin-bottom: 0.2rem;
+    font-size: 1.2rem;
+}
+
+.settings_types {
+    padding: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.settings_types>div {
+    padding: 0.3rem;
+    border-radius: 0.2rem;
+}
+
+.settings_types>div:nth-child(odd) {
+    background-color: $color-neutral-lighter;
+}
+
+.settings_form {
+    display: flex;
+    margin-top: 0.5rem;
+}
+
+.settings_form input {
+    flex: 1 1 auto;
+    padding: 0.5rem;
+    border: 1px solid $color-neutral;
+    border-radius: 0.3rem;
+    font-size: 1em;
+    outline: none;
+}
+.settings_profile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .settings_user {
+    display: flex;
+    align-items: center;
+  }
+  .settings_user img {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    margin: 1rem;
+  }
+  
